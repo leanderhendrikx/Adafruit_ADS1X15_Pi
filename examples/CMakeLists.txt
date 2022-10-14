@@ -1,0 +1,4 @@
+add_subdirectory(comparator)
+add_subdirectory(differential)
+add_subdirectory(nonblocking)
+add_subdirectory(singleended)

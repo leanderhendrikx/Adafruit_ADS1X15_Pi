@@ -30,6 +30,14 @@
 /**************************************************************************/
 #include "Adafruit_ADS1X15.h"
 
+extern "C" {
+#include <i2c/smbus.h>
+#include <linux/i2c-dev.h>
+}
+
+#include <fcntl.h>
+#include <sys/ioctl.h>
+
 /**************************************************************************/
 /*!
     @brief  Instantiates a new ADS1015 class w/appropriate properties
@@ -62,9 +70,18 @@ Adafruit_ADS1115::Adafruit_ADS1115() {
     @return true if successful, otherwise false
 */
 /**************************************************************************/
-bool Adafruit_ADS1X15::begin(uint8_t i2c_addr, TwoWire *wire) {
-  m_i2c_dev = new Adafruit_I2CDevice(i2c_addr, wire);
-  return m_i2c_dev->begin();
+bool Adafruit_ADS1X15::begin(uint8_t i2c_addr) {
+  const char* device = "/dev/i2c-1";
+  if ((m_i2c_fd = open(device, O_RDWR)) < 0) {
+    return false;
+  }
+
+  if (ioctl (m_i2c_fd, I2C_SLAVE, i2c_addr) < 0) {
+    m_i2c_fd = -1;
+    return false;
+  }
+
+  return true;
 }
 
 /**************************************************************************/
@@ -380,10 +397,9 @@ bool Adafruit_ADS1X15::conversionComplete() {
 */
 /**************************************************************************/
 void Adafruit_ADS1X15::writeRegister(uint8_t reg, uint16_t value) {
-  buffer[0] = reg;
-  buffer[1] = value >> 8;
-  buffer[2] = value & 0xFF;
-  m_i2c_dev->write(buffer, 3);
+  i2c_smbus_data data;
+  data.word = value>>8 | value<<8;
+  i2c_smbus_access(m_i2c_fd, I2C_SMBUS_WRITE, reg, I2C_SMBUS_WORD_DATA, &data) ; 
 }
 
 /**************************************************************************/
@@ -396,8 +412,8 @@ void Adafruit_ADS1X15::writeRegister(uint8_t reg, uint16_t value) {
 */
 /**************************************************************************/
 uint16_t Adafruit_ADS1X15::readRegister(uint8_t reg) {
-  buffer[0] = reg;
-  m_i2c_dev->write(buffer, 1);
-  m_i2c_dev->read(buffer, 2);
-  return ((buffer[0] << 8) | buffer[1]);
+  i2c_smbus_access(m_i2c_fd, I2C_SMBUS_WRITE, reg, I2C_SMBUS_WORD_DATA, nullptr) ; 
+  i2c_smbus_data data;
+  i2c_smbus_access(m_i2c_fd, I2C_SMBUS_READ, reg, I2C_SMBUS_WORD_DATA, &data);
+  return data.word>>8 | data.word<<8;
 }

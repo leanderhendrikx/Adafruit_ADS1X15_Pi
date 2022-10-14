@@ -16,9 +16,7 @@
 #ifndef __ADS1X15_H__
 #define __ADS1X15_H__
 
-#include <Adafruit_I2CDevice.h>
-#include <Arduino.h>
-#include <Wire.h>
+#include <cstdint>
 
 /*=========================================================================
     I2C ADDRESS/BITS
@@ -145,16 +143,19 @@ typedef enum {
     @brief  Sensor driver for the Adafruit ADS1X15 ADC breakouts.
 */
 /**************************************************************************/
+
+class I2CDevice;
+
 class Adafruit_ADS1X15 {
 protected:
   // Instance-specific properties
-  Adafruit_I2CDevice *m_i2c_dev; ///< I2C bus device
+  int m_i2c_fd;          ///< I2C bus device
   uint8_t m_bitShift;            ///< bit shift amount
   adsGain_t m_gain;              ///< ADC gain
   uint16_t m_dataRate;           ///< Data rate
 
 public:
-  bool begin(uint8_t i2c_addr = ADS1X15_ADDRESS, TwoWire *wire = &Wire);
+  bool begin(uint8_t i2c_addr = ADS1X15_ADDRESS);
   int16_t readADC_SingleEnded(uint8_t channel);
   int16_t readADC_Differential_0_1();
   int16_t readADC_Differential_0_3();
@@ -175,7 +176,6 @@ public:
 private:
   void writeRegister(uint8_t reg, uint16_t value);
   uint16_t readRegister(uint8_t reg);
-  uint8_t buffer[3];
 };
 
 /**************************************************************************/

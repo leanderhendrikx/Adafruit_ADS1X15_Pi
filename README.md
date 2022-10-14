@@ -1,4 +1,31 @@
-# Adafruit_ADS1015 ![Build Status](https://github.com/adafruit/Adafruit_ADS1X15/workflows/Arduino%20Library%20CI/badge.svg)[![Documentation](https://github.com/adafruit/ci-arduino/blob/master/assets/doxygen_badge.svg)](http://adafruit.github.io/Adafruit_ADS1X15/html/index.html)
+# Adafruit_ADS1015_Pi 
+Raspberry Pi/C++ library for the Adafruit ADS1X15 using smbus.
+
+Changes:
+- The Adafruit_I2CDevice dependency is replaced by smbus.
+- Arduino & Wire dependencies are removed.
+- Examples are ported to C++.
+- `continuous` example is removed because it would require a C/C++ gpio
+  interrupt library to function correctly. However, library is fully functional
+  and the ALRT can be used for interrupts.
+
+## Instructions
+The library and examples can be built using cmake >3.10:
+
+```
+mkdir build && cd build
+cmake ..
+cmake --build . --target all
+```
+
+The only dependency is `libi2c-dev` for i2c communication with the ADC.
+```apt install libi2c-dev```
+
+I2C needs to be enabled on the Pi and can be done using `raspi-config`.
+```raspi-config -> interface options -> enable i2c```
+
+------------------Original README.md------------------
+# Adafruit_ADS1015 
 
 
 Driver for TI's ADS1X15: 12 and 16-bit Differential or Single-Ended ADC with PGA and Comparator
