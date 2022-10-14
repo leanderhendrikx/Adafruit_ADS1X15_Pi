@@ -6,8 +6,8 @@ Changes:
 - Arduino & Wire dependencies are removed.
 - Examples are ported to C++.
 - `continuous` example is removed because it would require a C/C++ gpio
-  interrupt library to function correctly. However, library is fully functional
-  and the ALRT can be used for interrupts.
+  interrupt library to function correctly. However, the library is fully functional
+  and the ALRT pin can be used for interrupts.
 
 ## Instructions
 The library and examples can be built using cmake >3.10:
